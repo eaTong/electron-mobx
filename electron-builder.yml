@@ -1,8 +1,8 @@
-appId: com.example.app
+appId: com.example.electron-mobx
 copyright: Example co
-productName: MyApp
+productName: electron-mobx
 
-asar: false
+asar: true
 
 directories:
   buildResources: build-assets/

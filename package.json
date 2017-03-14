@@ -1,17 +1,26 @@
 {
   "name": "electron-mobx",
-  "description": "personal learn webpack...",
+  "description": "starter for create desktop application with electron & react & Mobx ",
   "version": "1.0.0",
-  "author": "eaTong",
+  "author": {
+    "name": "eaTong",
+    "email": "eatongchou@gmail.com"
+  },
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack-dev-server",
     "dist": "cross-env NODE_ENV=production webpack  --config webpack.production.config.js",
     "electron": "cross-env NODE_ENV=development electron ./app/main",
     "pack": "build --dir",
-    "build": "build",
+    "build-linux": "build -l",
+    "build-win": "build --win",
+    "build-mac": "build --mac",
     "build-all": "build -mwl"
   },
-  "keywords": [],
+  "keywords": [
+    "electron",
+    "react",
+    "mobx"
+  ],
   "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.4",
