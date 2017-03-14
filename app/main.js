@@ -19,10 +19,11 @@ function createWindow() {
     win.webContents.openDevTools();
   } else {
     win.loadURL(url.format({
-      pathname: path.join(__dirname, 'index.html'),
+      pathname: path.join(path.resolve(__dirname, '../dist'), 'index.html'),
       protocol: 'file:',
       slashes: true
     }));
+    win.webContents.openDevTools();
   }
 
   win.on('closed', () => {

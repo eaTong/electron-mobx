@@ -2,7 +2,7 @@ appId: com.example.electron-mobx
 copyright: Example co
 productName: electron-mobx
 
-asar: true
+asar: false
 
 directories:
   buildResources: build-assets/
@@ -12,6 +12,7 @@ files:
   - package.json
   - index.js
   - dist/
+  - app/
   - node_modules/
 
 dmg:
