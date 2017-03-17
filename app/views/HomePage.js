@@ -11,7 +11,6 @@ class HomePage extends Component {
   }
 
   componentWillMount() {
-
   }
 
   componentDidMount() {
