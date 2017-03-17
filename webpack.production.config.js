@@ -31,7 +31,13 @@ module.exports = {
   plugins: [
     new webpack.NamedModulesPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new HtmlWebpackPlugin({template: 'index-production.html', inject: false})
+    new HtmlWebpackPlugin({template: 'index-production.html', inject: false}),
+    new webpack.optimize.UglifyJsPlugin({
+      compress: {
+        warnings: false,
+        drop_console: true,
+      }
+    }),
   ],
   target: 'electron-renderer'
 };
