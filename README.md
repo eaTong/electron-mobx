@@ -12,6 +12,7 @@ Just cd to this directory and run `npm start`.
 Simple run `npm run build` as start.
 
 ### Roadmap
--[ ] Bug : Must hit `F5` in the devtools to see the code...
--[ ] add some code in `main process`,and maybe use `Mobx` in `main process` too.
--[ ] add menu management
+
+- [ ] Bug : Must hit `F5` in the devtools to see the code...
+- [ ] add some code in `main process`,and maybe use `Mobx` in `main process` too.
+- [ ] add menu management
