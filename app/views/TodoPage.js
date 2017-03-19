@@ -13,8 +13,8 @@ class TodoPage extends React.Component {
     this.refs.todo.value = '';
   }
 
-  completeTodo(index) {
-    this.props.todo.completeTodo(index);
+  toggleTodo(index) {
+    this.props.todo.toggleTodo(index);
   }
 
   render() {
@@ -22,7 +22,7 @@ class TodoPage extends React.Component {
     return (
       <div className="home-page">
         {todo.list.map((item, index) => (
-          <p key={item.id} onClick={this.completeTodo.bind(this, index)}>
+          <p key={item.id} onClick={this.toggleTodo.bind(this, index)}>
             {item.title}
             {item.complete ? '√' : '×'}
           </p>

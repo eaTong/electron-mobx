@@ -1,5 +1,13 @@
 # electron-mobx
-fast starter for react &amp;&amp; mobx
+Maybe this is the most lightweight starter for `electron` & `MobX` 
+As I said this is a lightweight starter,you may need to add another loader or plugins yourself such as `less-loader` to use `less` in your project or `sass-loader` to use `sass`,it's all up to you.I'm just trying to make it as simple as I can.
+
+### how to start development
+
+Just cd to this directory and run `npm start`.
+
+### hot to build 
+
+Simple run 'npm run build ' as start.
 
 
-Please wait ...It's not already yet..

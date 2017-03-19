@@ -21,7 +21,7 @@ class Todo {
     })
   }
 
-  @action completeTodo(index) {
+  @action toggleTodo(index) {
     this.items[index].complete = !this.items[index].complete;
   }
 }
