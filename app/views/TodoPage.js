@@ -2,6 +2,7 @@
  * Created by eatong on 17-3-13.
  */
 import React from 'react';
+import {Link} from 'react-router-dom';
 import {inject, observer} from 'mobx-react';
 
 @inject('todo') @observer
@@ -31,6 +32,7 @@ class TodoPage extends React.Component {
           <input type="text" ref="todo"/>
           <button onClick={this.addTodo.bind(this)}>add</button>
         </p>
+        <Link to='/'>back to main page....</Link>
       </div>
     );
   }
