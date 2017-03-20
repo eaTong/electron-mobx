@@ -7,10 +7,8 @@
     "email": "eatongchou@gmail.com"
   },
   "scripts": {
-    "start": "run-p start-dev electron",
+    "start": "cross-env NODE_ENV=development electron ./app/main",
     "build":"run-s dist build-all",
-    "start-dev": "cross-env NODE_ENV=development webpack-dev-server",
-    "electron": "cross-env NODE_ENV=development electron ./app/main",
     "dist": "cross-env NODE_ENV=production webpack  --config webpack.production.config.js",
     "build-all": "build -mwl"
   },
