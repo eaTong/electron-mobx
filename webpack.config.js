@@ -41,4 +41,5 @@ module.exports = {
     historyApiFallback: true,
     hot: true,
   },
+  target: 'electron-renderer'
 };
