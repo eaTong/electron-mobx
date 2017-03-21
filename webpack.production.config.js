@@ -31,7 +31,7 @@ module.exports = {
   plugins: [
     new webpack.NamedModulesPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new HtmlWebpackPlugin({template: 'index-production.html', inject: false}),
+    new HtmlWebpackPlugin({template: 'index.html', inject: false}),
     new webpack.DefinePlugin({
       'process.env': {
         'NODE_ENV': JSON.stringify('production')
