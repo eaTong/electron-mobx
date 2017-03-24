@@ -10,3 +10,6 @@ Just cd to this directory and run `npm start`.
 ### hot to build 
 
 Simple run `npm run build` as start.
+
+### Persist?
+If you want to persist your data ,such as storage in mySQL ,you can see my another project :[electron-mobx-member](https://github.com/eaTong/electron-mobx-member).
