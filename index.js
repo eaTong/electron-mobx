@@ -11,28 +11,10 @@ const nodeEnv = process.env.NODE_ENV;
 app.on('ready', () => {
 
   if (nodeEnv === 'development') {
-    const webpack = require("webpack");
-    const WebpackDevServer = require('webpack-dev-server');
-    const webpackConfig = require('./webpack.config');
-
     const sourceMapSupport = require('source-map-support');
     sourceMapSupport.install();
-
-    const compiler = webpack(webpackConfig);
-    const server = new WebpackDevServer(compiler, {
-      stats: {
-        colors: true
-      }
-    });
-
-    server.listen(3000, "127.0.0.1", function () {
-      console.log("Starting server on http://localhost:3000");
-      createWindow();
-    });
-
-  } else {
-    createWindow();
   }
+  createWindow();
 });
 
 app.on('window-all-closed', () => {
@@ -53,12 +35,15 @@ function createWindow() {
   const win = new BrowserWindow({width, height});
 
   if (nodeEnv === 'development') {
-    win.loadURL(url.format({
-      pathname: "localhost:3000",
-      protocol: 'http:',
-      slashes: true
-    }));
-    win.webContents.openDevTools();
+    //delay 1000ms to wait for webpack-dev-server start
+    setTimeout(function(){
+      win.loadURL(url.format({
+        pathname: "localhost:3000",
+        protocol: 'http:',
+        slashes: true
+      }));
+      win.webContents.openDevTools();
+    },1000);
   } else {
     win.loadURL(url.format({
       pathname: path.join(path.resolve(__dirname, './dist'), 'index.html'),
