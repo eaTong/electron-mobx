@@ -31,8 +31,10 @@ mac:
 
 win:
   target: nsis
+  icon: resources/icon
 
 linux:
+  icon: resources
   target:
     - deb
     - AppImage
