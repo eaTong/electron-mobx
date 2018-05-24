@@ -13,5 +13,7 @@ Simple run `npm run build` as start.
 
 ### Persist?
 If you want to persist your data ,such as storage in mySQL ,you can see my another project :[electron-mobx-member](https://github.com/eaTong/electron-mobx-member).
-### Knowing issue
-I have tested linux and windows only , and it got error when I tried to build dmg file in linux(Ubuntu),so you should only package linux and window in linux or windows.
+
+### platform support
+
+All platform has been tested already.

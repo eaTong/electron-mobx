@@ -12,13 +12,14 @@
     "start-electron": "cross-env NODE_ENV=development electron index",
     "build": "npm run dist && npm run build-all",
     "dist": "cross-env NODE_ENV=production webpack  --config webpack.production.config.js",
-    "build-all": "build -wl"
+    "build-all": "build -lmw"
   },
   "keywords": [
     "electron",
     "react",
     "mobx",
-    "react-router"
+    "react-router",
+    "webpack4"
   ],
   "license": "ISC",
   "dependencies": {},

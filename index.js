@@ -7,6 +7,7 @@ const path = require('path');
 const url = require('url');
 const nodeEnv = process.env.NODE_ENV;
 
+let win;
 
 app.on('ready', () => {
 
@@ -32,7 +33,7 @@ app.on('activate', () => {
 
 function createWindow() {
   const {width, height} = electron.screen.getPrimaryDisplay().workAreaSize;
-  const win = new BrowserWindow({width, height});
+   win = new BrowserWindow({width, height});
 
   if (nodeEnv === 'development') {
     //delay 1000ms to wait for webpack-dev-server start
