@@ -1,19 +1,20 @@
 {
   "presets": [
-    "es2015",
-    "stage-0",
-    "react"
+    "@babel/preset-env",
+    "@babel/preset-react"
   ],
   "env": {
-    "production": {
-      "plugins": [
-        "transform-decorators-legacy"
-      ]
-    },
     "development": {
       "plugins": [
-        "transform-decorators-legacy",
-        "react-hot-loader/babel"
+        "react-hot-loader/babel",
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose": true }]
+      ]
+    },
+    "production": {
+      "plugins": [
+        ["@babel/plugin-proposal-decorators", { "legacy": true }],
+        ["@babel/plugin-proposal-class-properties", { "loose": true }]
       ]
     }
   }
