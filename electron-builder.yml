@@ -1,6 +1,6 @@
-appId: com.example.electron-mobx-starter
+appId: cn.eatong.ds.upload
 copyright: Example co
-productName: electron-mobx-starter
+productName: 点石名匠图片上传工具
 
 asar: true
 
