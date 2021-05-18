@@ -1,7 +1,7 @@
 {
   "name": "electron-mobx",
   "description": "starter for create desktop application with electron & react & Mobx ",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "eaTong",
     "email": "eatongchou@gmail.com"

@@ -16,7 +16,8 @@ class HomePage extends Component {
       showLoginModal: false,
       materialNameList: [],
       notMatchedFiles: [],
-      currentLog: ''
+      currentLog: '',
+      progressTime: 0
     };
   }
 
@@ -52,7 +53,14 @@ class HomePage extends Component {
             current += materialIndex;
           }
         });
-        this.setState({currentLog: `完成进度：${ current}/${total}(${(100 *current / total).toFixed(2)}%)当前品牌：${materialNameList[currentIndex].brandName}，当前目录：${materialNameList[currentIndex].materialNames[materialIndex].path},状态：${status}`})
+        const currentLog = `完成进度：${current}/${total}(${(100 * current / total).toFixed(2)}%)
+        当前品牌：${materialNameList[currentIndex].brandName}，当前目录：${materialNameList[currentIndex].materialNames[materialIndex].path},
+        状态：${status}`;
+        this.setState({currentLog, progressTime: 0});
+        if (this.timer) {
+          clearInterval(this.timer);
+        }
+        this.timer = setInterval(() => this.setState({progressTime: this.state.progressTime + 1}), 1000)
       }
     })
   }
@@ -76,10 +84,10 @@ class HomePage extends Component {
   }
 
   render() {
-    const {showLoginModal, notMatchedFiles, currentLog} = this.state;
+    const {showLoginModal, notMatchedFiles, currentLog , progressTime} = this.state;
     return (
       <div className="home-page">
-        <div className="current-log">最新日志：{currentLog}</div>
+        <div className="current-log">最新日志：{currentLog}。耗时：{progressTime}</div>
         <Button onClick={() => this.toggleLoginModal()}>重新登录</Button>
         <Button onClick={() => this.selectPath()}>选择图片所在目录</Button> ： {this.state.rootPath}
         <Button onClick={() => this.autoImport()}>自动导入</Button>

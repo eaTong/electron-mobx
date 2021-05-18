@@ -16,7 +16,7 @@ let materialNameList = [];
 async function login(data) {
   const result = await axios.post(`${basePath}/api/business/login`, data)
   const businessList = result.data.data.business;
-  cookies = result.headers['set-cookie'].map(item => item.replace('; Path=/', '')).join(';');
+  cookies = (result.headers['set-cookie'] || []).map(item => item.replace('; Path=/', '')).join(';');
   const selectBusinessResult = await axios.get(`${basePath}/api/business/selectBusiness?_=1620971596834&business_id=${businessList[0].business_id}`, {headers: {Cookie: cookies}})
   cookies += ';' + selectBusinessResult.headers['set-cookie'].map(item => item.replace('; Path=/', '')).join(';');
   return result.data;
@@ -51,7 +51,7 @@ async function getPathFileList() {
         fs.readdirSync(materialPath).forEach(name => {
           if (/banner/.test(name)) {
             bannerPath = path.resolve(materialPath, name);
-          } else if (/封面/.test(name)) {
+          } else if (/封面\./.test(name)) {
             coverPath = path.resolve(materialPath, name);
           } else if (/描述/.test(name)) {
             descriptionPath = path.resolve(materialPath, name);
@@ -62,6 +62,7 @@ async function getPathFileList() {
           bannerPath,
           coverPath,
           descriptionPath,
+          pathName: materialName,
           matchedMaterials
         }
       }).filter(mat => mat.matchedMaterials.length > 0)
@@ -79,21 +80,38 @@ async function startUploadBrand(index = 0, materialIndex = 0, onProgress) {
   } else if (materialIndex === brand.materialNames.length) {
     await startUploadBrand(index + 1, 0, onProgress)
   } else {
-    console.log(brand.brandName, brand.materialNames.length);
     const materialInfo = brand.materialNames[materialIndex];
-
-    onProgress(index, materialIndex, '开始上传封面。。。');
     const imageInfo = {};
-    imageInfo.images = await uploadImage(materialInfo.coverPath);
-    onProgress(index, materialIndex, '开始上传banner。。。');
-    const bannerPathList = fs.readdirSync(materialInfo.bannerPath).map(name => path.resolve(materialInfo.bannerPath, name));
-    const banner_image = await uploadMultipleImage(bannerPathList);
-    imageInfo.banner_images = [banner_image];
+    if (fs.existsSync(materialInfo.coverPath)) {
+      onProgress(index, materialIndex, '开始上传封面。。。');
+      const coverImages = await uploadImage(materialInfo.coverPath);
+      imageInfo.images = [coverImages];
+    }
+    if (fs.existsSync(materialInfo.bannerPath)) {
+      const bannerPathList = fs.readdirSync(materialInfo.bannerPath).map(name => path.resolve(materialInfo.bannerPath, name));
+      if (bannerPathList && bannerPathList.length > 0) {
+        onProgress(index, materialIndex, '开始上传banner。。。');
+        const banner_image = await uploadMultipleImage(bannerPathList, (i, t) => onProgress(index, materialIndex, `开始上传banner图片${i}/${t}。。。`));
+        imageInfo.banner_images = banner_image;
+      }
+    }
+    if (fs.existsSync(materialInfo.descriptionPath)) {
+      const descriptionPathList = fs.readdirSync(materialInfo.descriptionPath).map(name => path.resolve(materialInfo.descriptionPath, name));
+      if (descriptionPathList && descriptionPathList.length > 0) {
+        onProgress(index, materialIndex, '开始上传描述图片。。。');
+        const descriptionImages = await uploadMultipleImage(descriptionPathList, (i, t) => onProgress(index, materialIndex, `开始上传描述图片${i}/${t}。。。`));
+        imageInfo.remark = descriptionImages.map(item => `<p><img src="${item}"/></p>`).join('');
+      }
+    }
 
-    onProgress(index, materialIndex, '开始上传描述图片。。。');
-    const descriptionPathList = fs.readdirSync(materialInfo.descriptionPath).map(name => path.resolve(materialInfo.descriptionPath, name));
-    const descriptionImages = await uploadMultipleImage(descriptionPathList);
-    imageInfo.remark = descriptionImages.map(item => `<p><img src="${item}"/></p>`).join('');
+    const donePath = path.resolve(materialInfo.path, '..', '..', '..', '自动处理完成', brand.brandName, materialInfo.pathName);
+    fs.ensureDirSync(donePath);
+    try {
+      fs.moveSync(path.resolve(materialInfo.path), donePath, {overwrite: true})
+    } catch (e) {
+      console.error(e);
+      console.error(path.resolve(materialInfo.path), donePath);
+    }
 
     materialInfo.matchedMaterials.forEach(async (material) => {
       const data = {...material, ...imageInfo};
@@ -124,10 +142,10 @@ function pathIsDir(pathName) {
 
 
 async function uploadImage(path) {
-  const form = new FormData();
-  form.append("file", fs.createReadStream(path));
   try {
 
+    const form = new FormData();
+    form.append("file", fs.createReadStream(path));
     const result = await axios.post(`${basePath}/api/file/upload`, form, {
       headers: {
         ...form.getHeaders(),
@@ -146,7 +164,7 @@ async function uploadImage(path) {
   }
 }
 
-async function uploadMultipleImage(pathList) {
+async function uploadMultipleImage(pathList, onProgress) {
   const list = [];
   // let index =0;
   await doUpload(0)
@@ -158,6 +176,7 @@ async function uploadMultipleImage(pathList) {
     }
     const url = await uploadImage(pathList[index]);
     list.push(url);
+    onProgress && onProgress(pathList.length, index);
     await doUpload(index + 1)
     // return [...list, url];
   }
