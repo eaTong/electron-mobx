@@ -8,10 +8,12 @@ const FormData = require("form-data");
 
 let rootPath = '';
 let cookies = ''
+let selectedType = '';
 const basePath = 'http://zc.dianshijz.cn'
 // const basePath = 'http://beta.yunzhizhuang.com:8082'
 let notMatchedFiles = [];
 let materialNameList = [];
+let materialList = [];
 
 async function login(data) {
   const result = await axios.post(`${basePath}/api/business/login`, data)
@@ -28,9 +30,14 @@ async function selectPath(path) {
   return {materialNameList, notMatchedFiles};
 }
 
+async function selectType(type) {
+  selectedType = type;
+  materialList = await getAllMaterials();
+  console.log(materialList.length);
+}
+
 async function getPathFileList() {
   notMatchedFiles = [];
-  const materialList = await getAllMaterials();
   materialNameList = fs.readdirSync(rootPath).filter(item => pathIsDir(path.resolve(rootPath, item))).map(brandName => {
     return {
       brandName: brandName,
@@ -51,10 +58,10 @@ async function getPathFileList() {
         fs.readdirSync(materialPath).forEach(name => {
           if (/banner/.test(name)) {
             bannerPath = path.resolve(materialPath, name);
-          } else if (/封面\./.test(name)) {
-            coverPath = path.resolve(materialPath, name);
           } else if (/描述/.test(name)) {
             descriptionPath = path.resolve(materialPath, name);
+          } else if (/.*\.((jpe?g)|(png)|(bmp))/i.test(name)) {
+            coverPath = path.resolve(materialPath, name);
           }
         });
         return {
@@ -86,23 +93,35 @@ async function startUploadBrand(index = 0, materialIndex = 0, onProgress) {
       onProgress(index, materialIndex, '开始上传封面。。。');
       const coverImages = await uploadImage(materialInfo.coverPath);
       imageInfo.images = [coverImages];
+    } else {
+      console.error(`找不到封面图:${materialInfo.path}`)
     }
     if (fs.existsSync(materialInfo.bannerPath)) {
       const bannerPathList = fs.readdirSync(materialInfo.bannerPath).map(name => path.resolve(materialInfo.bannerPath, name));
       if (bannerPathList && bannerPathList.length > 0) {
         onProgress(index, materialIndex, '开始上传banner。。。');
         const banner_image = await uploadMultipleImage(bannerPathList, (i, t) => onProgress(index, materialIndex, `开始上传banner图片${i}/${t}。。。`));
-        imageInfo.banner_images = banner_image;
+        imageInfo.banner_images = banner_image.filter(item => item);
       }
+    } else {
+      console.error(`找不到banner图:${materialInfo.path}`)
     }
     if (fs.existsSync(materialInfo.descriptionPath)) {
       const descriptionPathList = fs.readdirSync(materialInfo.descriptionPath).map(name => path.resolve(materialInfo.descriptionPath, name));
       if (descriptionPathList && descriptionPathList.length > 0) {
         onProgress(index, materialIndex, '开始上传描述图片。。。');
         const descriptionImages = await uploadMultipleImage(descriptionPathList, (i, t) => onProgress(index, materialIndex, `开始上传描述图片${i}/${t}。。。`));
-        imageInfo.remark = descriptionImages.map(item => `<p><img src="${item}"/></p>`).join('');
+        imageInfo.remark = descriptionImages.filter(item => item).map(item => `<p><img src="${item}"/></p>`).join('');
       }
+    } else {
+      console.error(`找不到描述图:${materialInfo.path}`)
     }
+
+    materialInfo.matchedMaterials.forEach(async (material) => {
+      const data = {...material, ...imageInfo};
+      await axios.post(`${basePath}/api/store/material/save`, data, {headers: {Cookie: cookies}});
+      onProgress(index, materialIndex, '数据处理完成。。。');
+    })
 
     const donePath = path.resolve(materialInfo.path, '..', '..', '..', '自动处理完成', brand.brandName, materialInfo.pathName);
     fs.ensureDirSync(donePath);
@@ -112,16 +131,7 @@ async function startUploadBrand(index = 0, materialIndex = 0, onProgress) {
       console.error(e);
       console.error(path.resolve(materialInfo.path), donePath);
     }
-
-    materialInfo.matchedMaterials.forEach(async (material) => {
-      const data = {...material, ...imageInfo};
-      await axios.post(`${basePath}/api/store/material/save`, data, {headers: {Cookie: cookies}});
-      onProgress(index, materialIndex, '数据处理完成。。。');
-    })
-
-
     await startUploadBrand(index, materialIndex + 1, onProgress);
-
   }
 }
 
@@ -129,10 +139,17 @@ async function getAllMaterials() {
   const result = await axios.post(`${basePath}/api/store/material/get`, {
     key_word: "",
     page: 0,
-    size: 20000
+    size: 20000,
+    type_id: selectedType
   }, {headers: {Cookie: cookies}});
   // console.log(materials)
   return result.data.data.list;
+}
+
+async function getTypeList() {
+  const result = await axios.post(`${basePath}/api/store/material/type/get`, {}, {headers: {Cookie: cookies}});
+  // console.log(materials)
+  return result.data.data;
 }
 
 function pathIsDir(pathName) {
@@ -193,5 +210,7 @@ async function uploadMultipleImage(pathList, onProgress) {
 module.exports = {
   selectPath,
   login,
-  startUploadBrand
+  startUploadBrand,
+  getTypeList,
+  selectType,
 };

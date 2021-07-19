@@ -4,7 +4,8 @@
 import React, {PropTypes, Component} from 'react';
 import {Button} from "antd";
 import {remote} from 'electron';
-import LoginModal from "../styles/LoginModal";
+import LoginModal from "./LoginModal";
+import TypeModal from "./TypeModal";
 
 const {uploaderService,} = remote.require('./app/services');
 
@@ -14,8 +15,10 @@ class HomePage extends Component {
     this.state = {
       rootPath: '',
       showLoginModal: false,
+      showTypeModal: false,
       materialNameList: [],
       notMatchedFiles: [],
+      typeList: [],
       currentLog: '',
       progressTime: 0
     };
@@ -30,10 +33,28 @@ class HomePage extends Component {
     this.setState({showLoginModal: !this.state.showLoginModal})
   }
 
+  toggleTypeModal() {
+    this.setState({showTypeModal: !this.state.showTypeModal})
+  }
+
   onSaveData(result) {
     uploaderService.login(result).then(result => {
       this.toggleLoginModal();
+      //
+      this.getTypeList();
+    })
+  }
+
+  onSelectType({type}) {
+    uploaderService.selectType(type).then(result => {
+      this.setState({showTypeModal: false})
       this.selectPath();
+    })
+  }
+
+  getTypeList() {
+    uploaderService.getTypeList().then(result => {
+      this.setState({typeList: result, showTypeModal: true});
     })
   }
 
@@ -84,11 +105,12 @@ class HomePage extends Component {
   }
 
   render() {
-    const {showLoginModal, notMatchedFiles, currentLog , progressTime} = this.state;
+    const {showLoginModal, notMatchedFiles, currentLog, progressTime, showTypeModal, typeList} = this.state;
     return (
       <div className="home-page">
         <div className="current-log">最新日志：{currentLog}。耗时：{progressTime}</div>
         <Button onClick={() => this.toggleLoginModal()}>重新登录</Button>
+        <Button onClick={() => this.toggleTypeModal()}>重新选择分类</Button>
         <Button onClick={() => this.selectPath()}>选择图片所在目录</Button> ： {this.state.rootPath}
         <Button onClick={() => this.autoImport()}>自动导入</Button>
         <h3>匹配材料</h3>
@@ -113,7 +135,12 @@ class HomePage extends Component {
           <p key={item}>{item}</p>
         ))}
         {showLoginModal && (
-          <LoginModal onCancel={() => this.toggleLoginModal()} onSaveData={(data) => this.onSaveData(data)}/>)}
+          <LoginModal onCancel={() => this.toggleLoginModal()} onSaveData={(data) => this.onSaveData(data)}/>)
+        }
+        {showTypeModal && (
+          <TypeModal onCancel={() => this.toggleTypeModal()} onSaveData={(data) => this.onSelectType(data)}
+                     typeList={typeList}/>)
+        }
       </div>
     );
   }
