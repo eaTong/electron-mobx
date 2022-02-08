@@ -9,19 +9,29 @@ const FormData = require("form-data");
 let rootPath = '';
 let cookies = ''
 let selectedType = '';
-const basePath = 'http://zc.dianshijz.cn'
+const basePath = 'https://mall.mjzsxxkj.cn'
 // const basePath = 'http://beta.yunzhizhuang.com:8082'
 let notMatchedFiles = [];
 let materialNameList = [];
 let materialList = [];
+let businessList = [];
+
 
 async function login(data) {
   const result = await axios.post(`${basePath}/api/business/login`, data)
-  const businessList = result.data.data.business;
+  businessList = result.data.data.business;
   cookies = (result.headers['set-cookie'] || []).map(item => item.replace('; Path=/', '')).join(';');
-  const selectBusinessResult = await axios.get(`${basePath}/api/business/selectBusiness?_=1620971596834&business_id=${businessList[0].business_id}`, {headers: {Cookie: cookies}})
-  cookies += ';' + selectBusinessResult.headers['set-cookie'].map(item => item.replace('; Path=/', '')).join(';');
+  if (businessList.length === 1) {
+    await selectBusiness(businessList[0].business_id)
+  }
   return result.data;
+}
+
+async function selectBusiness(businessId) {
+  console.log(businessId)
+  const selectBusinessResult = await axios.get(`${basePath}/api/business/selectBusiness?_=1620971596834&business_id=${businessId}`, {headers: {Cookie: cookies}})
+  console.log(selectBusinessResult);
+  cookies += ';' + selectBusinessResult.headers['set-cookie'].map(item => item.replace('; Path=/', '')).join(';');
 }
 
 async function selectPath(path) {
@@ -211,6 +221,7 @@ module.exports = {
   selectPath,
   login,
   startUploadBrand,
+  selectBusiness,
   getTypeList,
   selectType,
 };

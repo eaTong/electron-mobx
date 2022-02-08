@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import {Modal, Tree, Checkbox, Input, Form} from 'antd';
+import {Modal, Tree, Checkbox, Input, Form, Radio} from 'antd';
 
 const FormItem = Form.Item;
+const RadioGroup = Radio.Group;
 
 const formItemLayout = {
   labelCol: {
@@ -38,7 +39,7 @@ class LoginModal extends Component {
           label="账号"
           hasFeedback>
           {getFieldDecorator('account', {
-            initialValue:'18288756143',
+            initialValue: '15198784497',
             rules: [
               {required: true, whitespace: true, message: '请填写账号'}
             ]
@@ -51,7 +52,7 @@ class LoginModal extends Component {
           label="密码"
           hasFeedback>
           {getFieldDecorator('password', {
-            initialValue:'a12345',
+            initialValue: 'a12345',
             rules: [
               {required: true, whitespace: true, message: '请填写密码'}
             ]
@@ -59,6 +60,26 @@ class LoginModal extends Component {
             <Input placeholder="请输入新密码"/>
           )}
         </FormItem>
+        {this.props.businessList.length > 0 && (
+          <FormItem
+            {...formItemLayout}
+            label="选择公司"
+            hasFeedback>
+            {getFieldDecorator('businessId', {
+              rules: [
+                {required: true, whitespace: true, message: '请选择公司'}
+              ]
+            })(
+              <RadioGroup>
+                {this.props.businessList.map(item => (
+                  <Radio key={item.business_id + ''} value={item.business_id + ''}>{item.business_name}</Radio>
+                ))}
+              </RadioGroup>
+            )}
+          </FormItem>
+
+        )}
+
       </Form>
 
     </Modal>)

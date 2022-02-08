@@ -18,6 +18,7 @@ class HomePage extends Component {
       showTypeModal: false,
       materialNameList: [],
       notMatchedFiles: [],
+      businessList: [],
       typeList: [],
       currentLog: '',
       progressTime: 0
@@ -38,11 +39,24 @@ class HomePage extends Component {
   }
 
   onSaveData(result) {
-    uploaderService.login(result).then(result => {
-      this.toggleLoginModal();
-      //
-      this.getTypeList();
-    })
+    if (result.businessId) {
+
+      uploaderService.selectBusiness(result.businessId).then(result => {
+
+        this.toggleLoginModal();
+        this.getTypeList();
+      });
+    } else {
+      uploaderService.login(result).then(result => {
+        if (result.data && result.data.business && result.data.business.length > 1) {
+          this.setState({businessList: result.data.business})
+        } else {
+          this.toggleLoginModal();
+          this.getTypeList();
+        }
+        //
+      })
+    }
   }
 
   onSelectType({type}) {
@@ -105,7 +119,7 @@ class HomePage extends Component {
   }
 
   render() {
-    const {showLoginModal, notMatchedFiles, currentLog, progressTime, showTypeModal, typeList} = this.state;
+    const {showLoginModal, notMatchedFiles, currentLog, progressTime, showTypeModal, typeList, businessList} = this.state;
     return (
       <div className="home-page">
         <div className="current-log">最新日志：{currentLog}。耗时：{progressTime}</div>
@@ -135,7 +149,8 @@ class HomePage extends Component {
           <p key={item}>{item}</p>
         ))}
         {showLoginModal && (
-          <LoginModal onCancel={() => this.toggleLoginModal()} onSaveData={(data) => this.onSaveData(data)}/>)
+          <LoginModal onCancel={() => this.toggleLoginModal()} onSaveData={(data) => this.onSaveData(data)}
+                      businessList={businessList}/>)
         }
         {showTypeModal && (
           <TypeModal onCancel={() => this.toggleTypeModal()} onSaveData={(data) => this.onSelectType(data)}
